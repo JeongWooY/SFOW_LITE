@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="so_return">
+
+<resultMap type="returnAdd"  
+           id="returnAddResult">
+	<!-- <result property="필드명"  column="컬럼명"/>	 -->
+	<result property="company_code"  column="company_code"/>	
+	<result property="return_number"  column="return_number"/>	
+	<result property="return_date"  column="return_date"/>	
+	<result property="client_code"  column="client_code"/>
+	<result property="client_name"  column="client_name"/>		
+	<result property="out_status"  column="out_status"/>
+	<result property="memo"  column="memo"/>
+	<result property="create_date"  column="create_date"/>
+	<result property="create_user"  column="create_user"/>
+	<result property="update_date"  column="update_date"/>
+	<result property="update_user"  column="update_user"/>			
+</resultMap>
+
+	<!-- 전체조회  -->
+	<select id="getReturnAdd" resultMap="returnAddResult">
+		<![CDATA[
+			select *
+			from so_return_add
+			where company_code = #{company_code}
+		]]> 	
+	</select>
+	
+	<!-- 날짜로 반품 조회  -->
+	<select id="getReturnAddByDate" parameterType="String" resultMap="returnAddResult">
+    	<![CDATA[
+		    SELECT *
+		    FROM so_return_add
+		    WHERE return_date = #{return_date}
+		    and company_code = #{company_code}
+	    ]]>
+	</select>
+	
+	<!-- 선택한 행 삭제 -->
+    <delete id="deleteByReturnNumber" parameterType="String">
+        <![CDATA[
+	        DELETE FROM so_return_add
+	        WHERE return_number = #{returnNumber}
+        ]]>
+    </delete>
+    
+    <!-- 추가된 열에 insert -->
+    <insert id="insertReturnAdd" parameterType="map">
+        <![CDATA[
+        INSERT INTO so_return_add (company_code, client_code, client_name, return_date, memo)
+        VALUES (#{company_code}, #{client_code}, #{client_name}, #{return_date}, #{memo})
+        ]]>
+    </insert>
+
+	<!-- 수정된 열에 update -->
+    <update id="updateReturnAdd" parameterType="map">
+        <![CDATA[
+        UPDATE so_return_add
+        SET company_code = #{company_code}, client_code = #{client_code}, client_name = #{client_name},
+        return_date = #{return_date}, memo = #{memo}
+        WHERE return_number = #{return_number}
+        ]]>
+    </update>
+    
+   	<!-- 고객사 조회  -->
+	<select id="getClient" resultType="java.util.Map">
+	  <![CDATA[
+	    select client_code, client_name
+	    from ma_client_company
+	    where company_code = #{company_code}
+	  ]]>
+	</select>
+	
+	<!-- 반품상태 확정 -->
+    <update id="conFirmStatus" parameterType="String">
+       <![CDATA[
+       UPDATE so_return_add
+       SET out_status = 1
+       WHERE return_number = #{return_number}
+       and company_code = #{company_code}
+       ]]>
+    </update>
+	
+	<!-- 반품상태 저장 -->
+    <update id="cancelStatus" parameterType="String">
+       <![CDATA[
+       UPDATE so_return_add
+       SET out_status = 0
+       WHERE return_number = #{return_number}
+       and company_code = #{company_code}
+       ]]>
+    </update>
+    
+   	<!-- 반품확정 회사코드로 조회  -->
+	<select id="getInfoByClient" resultType="java.util.Map" parameterType="map" >
+	  <![CDATA[
+		SELECT company_code, return_number, client_code, client_name, receive_date, item_code,
+		item_no, item_name, item_type, item_specification, item_quantity, lot_number, item_detail_memo 
+		FROM return_info_view
+		where out_status = 1
+		and company_code = #{company_code}
+		and client_code = #{client_code}
+	  ]]>
+	</select>
+
+</mapper>

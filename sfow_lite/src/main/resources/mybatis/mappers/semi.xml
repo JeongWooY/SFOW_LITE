@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="semi">
+
+<resultMap type="semiDTO" id="semiDTO">
+        <result property="companyCode" column="company_code"/>
+        <result property="itemCode" column="item_code"/>
+        <result property="itemName" column="item_name"/>
+        <result property="itemNo" column="item_no"/>
+        <result property="item_type" column="item_type"/>
+        <result property="itemSpecification" column="item_specification"/>
+        <result property="itemStockUnit" column="item_stock_unit"/>
+        <result property="lotSize" column="lotsize"/>
+        <result property="memo" column="memo"/>
+        <result property="useyn" column="useyn"/>
+        <result property="createdate" column="createdate"/>
+        <result property="updatedate" column="updatedate"/>
+    </resultMap> 
+     
+
+	<select id="semiList" resultType="semiDTO" parameterType="map">
+		<![CDATA[
+		select company_code as companyCode, item_code as itemCode,item_name as itemName,item_no as itemNo,item_type,item_specification as itemSpecification,item_stock_unit as itemStockUnit,lotsize,memo,useyn,createdate,updatedate
+			from ma_item  
+			
+			where item_category='반제품' AND (useyn='Y' or useyn is null)
+			 AND company_code=#{companyCode} 
+						
+		order by item_code 
+		]]>	
+	</select>
+
+	<select id="semiListSearch" resultMap="semiDTO" parameterType="map">
+		<![CDATA[
+		select company_code as companyCode, item_code as itemCode,item_name as itemName,item_no as itemNo,item_type,item_specification as itemSpecification,item_stock_unit as itemStockUnit,lotsize,memo,useyn,createdate,updatedate
+			from ma_item
+			where  item_category='반제품'
+			
+						 AND (useyn='Y' or useyn is null)
+						 AND COALESCE(item_code, '') LIKE CONCAT('%', #{dto.itemCode}, '%')
+						 AND COALESCE(item_name, '') LIKE CONCAT('%', #{dto.itemName}, '%')
+						 AND COALESCE(item_no, '') LIKE CONCAT('%', #{dto.itemNo}, '%')
+						 AND company_code=#{companyCode} 
+		order by item_code 
+		]]>	
+	</select>
+
+	<insert id="insertSemi" parameterType="map">
+
+		INSERT INTO ma_item (company_code,item_name, item_no, item_type, item_specification, item_stock_unit, lotsize, memo,useyn,createdate,item_category) 
+		values (#{companyCode},#{elements.itemName}, #{elements.itemNo}, #{elements.item_type}, #{elements.itemSpecification}, #{elements.itemStockUnit}, #{elements.lotSize}, #{elements.memo}, #{elements.useyn},now(),'반제품')
+	</insert>
+	
+	
+	<update id="updateSemi" parameterType="map">
+		update ma_item
+		set item_name=#{elements.itemName}, item_no=#{elements.itemNo}, item_type=#{elements.item_type} ,item_specification=#{elements.itemSpecification},item_stock_unit=#{elements.itemStockUnit}, lotsize=#{elements.lotSize}, memo=#{elements.memo},useyn=#{elements.useyn} ,updatedate=CURRENT_TIMESTAMP
+		where item_code=#{elements.itemCode}
+	</update>
+
+	<update id="useUpdate" parameterType="String">
+		<![CDATA[
+			update ma_item
+			set useyn='N'
+			where item_code=#{elements.itemCode}
+		]]>
+	</update>
+	
+	<!-- Client modal   -->
+	<select id="getModalClient" resultType="Map">
+      <![CDATA[
+         SELECT client_code,client_name
+		 FROM ma_client_company
+      ]]>
+   </select>
+
+  <!-- 품목유형등록 목록-->
+ <select id="selectitem_type" resultType="semiDTO">
+ <![CDATA[
+ 	SELECT item_category as itemCategory, item_type
+	FROM ma_item_type
+	WHERE item_category='반제품'
+ ]]>
+ </select>
+
+	<!-- 품목유형등록(제품) 검색 -->
+  <select id="typeselectsearch" resultType="semiDTO" parameterType="semiDTO">
+ <![CDATA[
+ 	SELECT item_category as itemCategory, item_type
+	FROM ma_item_type
+	WHERE item_category='반제품'
+	AND COALESCE(item_type, '') LIKE CONCAT('%',#{item_type},'%')
+  ]]>
+ </select>
+
+</mapper>  

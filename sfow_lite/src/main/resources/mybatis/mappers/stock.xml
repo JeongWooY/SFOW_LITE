@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.stock">
+	
+	<resultMap type="com.yeonoo.sfow.stock.domain.Stock" id="stockResult">
+		<result property="company_code" column="company_code"/>
+		<result property="item_code" column="item_code"/>
+		<result property="warehouse_code" column="warehouse_code"/>
+		<result property="area_code" column="area_code"/>
+		<result property="lot_no" column="lot_no"/>
+		<result property="item_type" column="item_type"/>
+		<result property="pass_quantity" column="pass_quantity"/>
+		<result property="fail_quantity" column="fail_quantity"/>
+		<result property="quantity" column="quantity"/>
+		<result property="stock_status" column="stock_status"/>
+	</resultMap>
+
+	
+<select id="allStockList" resultType="com.yeonoo.sfow.stock.domain.Stock">
+	<![CDATA[select i.item_type,w.warehouse_name,i.item_name,i.item_code,pass_quantity,fail_quantity,quantity
+from ma_item i,wh w,mt_stock_detail st
+where i.warehouse_code = w.warehouse_code
+and st.item_code=i.item_code]]>
+</select>
+
+<select id="searchStockList" resultType="com.yeonoo.sfow.stock.domain.Stock">
+<![CDATA[
+SELECT * FROM mt_stock_detail
+WHERE COALESCE(warehouse_name, '') LIKE CONCAT('%', #{warehouse_name}, '%')
+AND COALESCE(item_type, '') LIKE CONCAT('%', #{item_type}, '%')
+AND COALESCE(item_code, '') LIKE CONCAT('%', #{item_code}, '%')
+AND COALESCE(item_name, '') LIKE CONCAT('%', #{item_name}, '%')]]>
+</select>
+
+<select id="allStockList2" resultType="com.yeonoo.sfow.stock.domain.Stock">
+	<![CDATA[select lot_no,pass_quantity,fail_quantity,quantity from mt_stock_detail
+where item_code=#{item_code}]]>
+</select>
+
+
+
+
+<update id="updateStock" parameterType="com.yeonoo.sfow.stock.domain.Stock">
+		<![CDATA[update mt_stock_detail
+				 set pass_quantity=#{pass_quantity},fail_quantity=#{fail_quantity},quantity=#{quantity}
+				 where item_code=#{item_code}]]>
+</update>
+
+
+</mapper>

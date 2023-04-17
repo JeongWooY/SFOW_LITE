@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="mapper.FMpr">
+ 
+	<resultMap type="FMpr"  
+	           id="FMprResult">
+		<!-- <result property="필드명"  column="컬럼명"/>	 -->
+		<result property="item_type"  column="item_type"/>	
+		<result property="client_name"  column="client_name"/>	
+		<result property="item_code"  column="item_code"/>	
+		<result property="item_name"  column="item_name"/>	
+		<result property="item_no"  column="item_no"/>	
+		<result property="item_specification"  column="item_specification"/>	
+		<result property="item_stock_unit"  column="item_stock_unit"/>	
+		<result property="request_quantity"  column="request_quantity"/>	
+		<result property="price"  column="price"/>	
+		<result property="amount"  column="amount"/>	
+	</resultMap>
+	
+	<!-- 전체목록조회 -->
+	<select id="FMprAllList"  resultMap="FMprResult">
+		<![CDATA[
+			SELECT prd.request_order,mi.item_type,mcc.client_name,mi.item_code,mi.item_name,mi.item_no,mi.item_specification,mi.item_stock_unit,prd.request_quantity,mi.buy_price,prd.amount
+			FROM po_request_detail prd, ma_item mi, ma_client_company mcc
+			WHERE prd.item_code = mi.item_code
+			AND prd.client_code = mcc.client_code
+			
+		]]>
+	</select>
+	
+	<!-- 수정하기 -->
+	<update id="updateFMpr" parameterType="FMpr">
+		<![CDATA[
+		UPDATE po_request_detail prd, ma_item mi, ma_client_company mcc
+		SET 
+		    mi.item_type = #{item_type},
+		    mcc.client_name = #{client_name},
+		    mi.item_name = #{item_name},
+		    mi.item_no = #{item_no},
+		    mi.item_specification = #{item_specification},
+		    mi.item_stock_unit = #{item_stock_unit},
+		    prd.request_quantity = #{request_quantity},
+		    mi.buy_price = #{buy_price},
+		    prd.amount = #{amount}
+		WHERE prd.item_code = mi.item_code
+		AND prd.client_code = mcc.client_code
+		AND prd.request_order = #{request_order}
+		]]>
+	</update>
+	
+		<!-- 검색하기 -->
+   <select id="FMprList" resultMap="FMprResult">
+      <![CDATA[
+         select prd.request_order,mi.item_type,mcc.client_name,mi.item_code,mi.item_name,mi.item_no,mi.item_specification,mi.item_stock_unit,prd.request_quantity,mi.buy_price,prd.amount
+         from po_request_detail prd, ma_item mi, ma_client_company mcc
+         where prd.item_code = mi.item_code
+		 AND prd.client_code = mcc.client_code
+		 
+         
+         and COALESCE(mi.item_type, '') LIKE CONCAT('%', #{item_type}, '%')
+         and COALESCE(mcc.client_name, '') LIKE CONCAT('%', #{client_name}, '%')
+         and COALESCE(mi.item_code, '') LIKE CONCAT('%', #{item_code}, '%')
+         
+      ]]>   
+   </select>
+   
+   	<!-- 등록하기-->
+<insert id="insertFMpr" parameterType="FMpr" useGeneratedKeys="true" keyProperty="request_order">
+    INSERT INTO FMpr (
+        request_order, item_type, client_name, item_code, item_name, item_no, item_specification, item_stock_unit, request_quantity, buy_price, amount
+    ) VALUES (
+       #{request_order}, #{item_type}, #{client_name}, #{item_code}, #{item_name}, #{item_no}, #{item_specification}, #{item_stock_unit}, #{request_quantity}, #{buy_price}, #{amount}
+    )
+</insert>
+	
+</mapper>    
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+

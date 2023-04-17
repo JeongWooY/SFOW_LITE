@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.shipout">
+	<select id="getList" parameterType="Map" resultType="shipOut">
+		<![CDATA[
+			SELECT out_code AS outCode, order_number AS orderNumber, client_code AS clientCode,
+				   out_type AS outType, trans_type AS transType, out_plan_date AS outPlanDate,
+				   out_manager AS outManager, out_status AS outStatus, memo, create_date AS createDate, create_user AS createUser,
+				   update_date AS updateDate, update_user AS updateUser, delete_yes_no AS deleteYesNo  
+			FROM so_shipout
+ 			where company_code=#{companyCode} AND
+ 				  COALESCE(out_code, '') LIKE CONCAT('%', #{searchDTO.outCode}, '%') AND  
+ 				  COALESCE(order_number, '') LIKE CONCAT('%', #{searchDTO.orderNumber}, '%') AND 
+				  COALESCE(client_code, '') LIKE CONCAT('%', #{searchDTO.clientCode}, '%') AND 
+				  COALESCE(out_type, '') LIKE CONCAT('%', #{searchDTO.outType}, '%') AND 
+				  COALESCE(trans_type, '') LIKE CONCAT('%', #{searchDTO.transType}, '%') AND 
+		]]>		  
+				  <if test="outPlanDate != null and outPlanDate != ''">
+ 				  COALESCE(out_plan_date, '') = DATE(#{searchDTO.outPlanDate}) AND
+ 				  </if>
+ 		<![CDATA[		   
+ 				  COALESCE(out_manager, '') LIKE CONCAT('%', #{searchDTO.outManager}, '%') AND 
+				  COALESCE(out_status, '') LIKE CONCAT('%', #{searchDTO.outStatus}, '%') AND 
+				  COALESCE(memo, '') LIKE CONCAT('%', #{searchDTO.memo}, '%') AND 
+ 		]]>
+ 				  <if test="createDate != null and createDate != ''">
+ 				  COALESCE(create_date, '') = DATE(#{searchDTO.createDate}) AND
+ 				  </if> 
+ 		<![CDATA[		  
+ 				  COALESCE(create_user, '') LIKE CONCAT('%', #{searchDTO.createUser}, '%') AND 
+				  delete_yes_no='N'
+		]]>		  
+	</select>  
+
+	<select id="getModalItem" resultType="Map">
+		<![CDATA[
+			SELECT a.order_number AS orderNumber, a.client_code AS clientCode, a.company_code AS companyCode
+			FROM so_order a
+			where a.order_status="확정"
+		]]>
+	</select>
+
+	<update id="deleteStatus" parameterType="String">
+		<![CDATA[
+			update so_shipout
+			set delete_yes_no='Y'
+			where out_code=#{outCode}
+		]]>
+	</update>
+	
+	<insert id="writeShipout" parameterType="shipOut" useGeneratedKeys="true" keyProperty="outCode">
+		<selectKey keyProperty="outCode" resultType="string" order="BEFORE">
+			SELECT so_shipout_seq_12('SOUT') FROM DUAL
+		</selectKey>
+		<![CDATA[
+			insert into so_shipout (out_code, order_number, client_code, company_code,
+									out_type, trans_type, out_plan_date, out_manager, memo, create_user, update_user)
+			values (#{outCode}, #{orderNumber}, #{clientCode}, #{companyCode},
+					#{outType}, #{transType}, #{outPlanDate}, #{outManager}, #{memo}, #{createUser}, #{updateUser})
+		]]>
+	</insert>
+	
+	<select id="getOrderNumber" parameterType="String" resultType="itemShipOutDTO">
+		<![CDATA[
+			SELECT a.out_code AS outCode, b.order_number AS orderNumber, b.item_code AS itemCode, b.quantity,
+				   b.price, b.amount, b.item_st_unit AS itemStockUnit, c.item_name AS itemName, c.item_no AS itemNo
+			FROM so_shipout a left join so_order_detail b ON a.order_number=b.order_number JOIN ma_item c ON b.item_code=c.item_code
+			WHERE b.order_number=#{orderNumber} AND b.delete_yes_no='N'
+		]]>
+	</select>
+	
+	<select id="getLot" parameterType="String" resultType="lotShipOutDTO">
+		<![CDATA[
+			SELECT b.lot_no AS lotNo, a.item_code AS itemCode, a.item_name AS itemName, a.item_no AS itemNo, 
+	    		   a.item_specification AS itemSpec, b.quantity, b.warehouse_code AS warehouseCode
+			FROM ma_item a left JOIN mt_stock_detail b ON a.item_code=b.item_code JOIN so_order_detail c ON a.item_code=c.item_code
+			WHERE c.order_number=#{orderNumber} AND c.delete_yes_no='N'
+		]]>
+	</select>
+	
+	<update id="statusUpdate" parameterType="String">
+		<![CDATA[
+			update so_shipout
+			  set out_status =
+				CASE out_status
+				  WHEN '등록' THEN '확정'
+				  WHEN '확정' THEN '등록'
+				  ELSE out_status
+				END  	
+			where out_code=#{outCode}
+		]]>
+	</update>
+	
+	<update id="updateShipOut" parameterType="shipOut">
+		<![CDATA[
+			update so_shipout
+			set order_number=#{orderNumber}, out_type=#{outType}, trans_type=#{transType}, out_plan_date=#{outPlanDate},
+				out_manager=#{outManager}, memo=#{memo}, create_user=#{createUser}, update_date=current_timestamp, update_user=#{updateUser} 
+			where out_code=#{outCode}
+		]]>
+	</update>
+	
+</mapper>

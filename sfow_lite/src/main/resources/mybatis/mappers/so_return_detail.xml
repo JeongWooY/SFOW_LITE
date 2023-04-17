@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="so_return_detail">
+
+<resultMap type="returnDetail"   
+           id="returnDetailResult">
+	<!-- <result property="필드명"  column="컬럼명"/>	 -->
+	<result property="sorder"  column="sorder"/>	
+	<result property="return_number"  column="return_number"/>	
+	<result property="company_code"  column="company_code"/>	
+	<result property="item_code"  column="item_code"/>
+	<result property="receive_date"  column="receive_date"/>
+	<result property="lot_number"  column="lot_number"/>		
+	<result property="item_quantity"  column="item_quantity"/>		
+	<result property="memo"  column="memo"/>		
+</resultMap>
+	
+	
+	
+    <!-- 추가된 열에 insert -->
+    <insert id="insertReturnDetail" parameterType="map">
+        <![CDATA[
+        INSERT INTO so_return_detail (return_number, company_code, item_code,receive_date, lot_number, item_quantity, memo)
+        VALUES (#{return_number}, #{company_code}, #{item_code}, #{receive_date}, #{lot_number} , #{item_quantity} , #{memo})
+        ]]>
+    </insert>
+
+	<!-- 수정된 열에 update -->
+    <update id="updateReturnDetail" parameterType="map">
+        <![CDATA[
+        UPDATE so_return_detail
+        SET return_number = #{return_number}, company_code = #{company_code}, 
+        item_code = #{item_code}, receive_date = #{receive_date}, lot_number = #{lot_number},
+        item_quantity = #{item_quantity}, memo = #{memo}
+        WHERE sorder = #{sorder}
+        ]]>
+    </update>
+    
+   <!-- 삭제  -->
+	<delete id="deleteReturnDetail" parameterType="java.util.List">
+	    DELETE FROM so_return_detail WHERE sorder IN
+	    <foreach item="sorder" index="index" collection="list" open="(" separator="," close=")">
+	        #{sorder}
+	    </foreach>
+	</delete>
+	
+   	<!-- 아이템 코드로조회 자식창 -->
+	<select id="getItem" resultType="java.util.Map" parameterType="String">
+	  <![CDATA[
+	    select item_code , item_no , item_name , item_type , item_stock_unit 
+		from ma_item
+		where company_code = #{company_code}
+	  ]]>
+	</select>
+	
+	<!-- 반품확정 조회  -->
+	<select id="getReturnInfo" resultType="java.util.Map" parameterType="String">
+	  <![CDATA[
+		SELECT company_code, return_number, client_code, client_name, receive_date, item_code,
+		item_no, item_name, item_type, item_specification, item_quantity, lot_number, item_detail_memo 
+		FROM return_info_view
+		where out_status = 1
+		and company_code = #{company_code}
+	  ]]>
+	</select>
+
+</mapper>

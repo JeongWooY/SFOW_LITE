@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.item">
+
+ <!-- 품목유형등록 목록-->
+ <select id="getItemType" resultType="ItemType" parameterType="String">
+ <![CDATA[
+ 	select * from ma_itemtype
+ 	where company_code = #{company_code}
+ ]]>
+ </select>
+ <!-- 품목유형등록 등록 -->
+ <insert id="insertItemType" parameterType="ItemType">
+ <![CDATA[
+ 	insert into ma_itemtype(item_category,item_type,company_code)
+	values(#{item_category},#{item_type},#{company_code})
+ ]]>
+</insert>
+ <!-- 품목유형등록 삭제 -->
+ <delete id="deleteItemType">
+ <![CDATA[
+ 	delete from ma_itemtype where item_category=#{item_category} and item_type=#{item_type} and company_code = #{company_code}
+ ]]>
+</delete>
+<!-- 품목유형등록 검색-->
+  <select id="getItemTypeSearch" resultType="ItemType" parameterType="ItemType">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_itemtype
+	WHERE COALESCE(item_type, '') LIKE CONCAT('%',#{item_type},'%')
+    AND COALESCE(item_category, '') LIKE CONCAT('%',#{item_category},'%')
+    AND company_code = #{company_code}
+  ]]>
+ </select>
+ <!-- 품목등록(제품) 목록-->
+ <select id="getItemProduct" resultType="ItemProduct" parameterType="String">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_item WHERE (useyn is NULL OR useyn = 'y')
+	AND item_category='제품'
+	AND company_code = #{company_code}
+ ]]>
+ </select>
+  <!-- 품목등록(제품) 등록 -->
+ <insert id="insertProduct" parameterType="ItemProduct">
+ <![CDATA[
+ 	INSERT INTO ma_item(company_code,item_category,item_name,item_no,item_type,item_specification,item_stock_unit,useyn,lotsize,memo,createdate)
+	VALUE(#{company_code},'제품',#{item_name},#{item_no},#{item_type},#{item_specification},#{item_stock_unit},#{useyn},#{lotsize},#{memo},CURRENT_TIMESTAMP)
+ ]]>
+</insert>
+<!-- 품목등록(제품) 수정 -->
+<update id="updateProduct" parameterType="ItemProduct">
+ <![CDATA[
+ update ma_item set item_name=#{item_name},item_no=#{item_no},item_type=#{item_type},item_specification=#{item_specification},item_stock_unit=#{item_stock_unit},lotsize=#{lotsize},memo=#{memo},useyn=#{useyn},updatedate=CURRENT_TIMESTAMP
+ where item_code=#{item_code} AND company_code = #{company_code} AND item_category = '제품'
+ ]]>
+ </update>
+ <!-- 품목등록(제품) 삭제(수정) -->
+<update id="updelProduct" parameterType="ItemProduct">
+ <![CDATA[
+ update ma_item set useyn='N'
+ where item_code=#{item_code} AND company_code = #{company_code} AND item_category = '제품'
+ ]]>
+ </update>
+ <!-- 품목등록(제품) 삭제 -->
+ <delete id="deleteProduct">
+ <![CDATA[
+ 	delete from ma_item where item_code=#{item_code} AND company_code = #{company_code} AND item_category = '제품'
+ ]]>
+</delete>
+ <!-- 품목등록(제품) 검색-->
+  <select id="getItemProductSearch" resultType="ItemProduct" parameterType="ItemProduct">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_item
+	WHERE COALESCE(item_code, '') LIKE CONCAT('%',#{item_code},'%')
+    AND COALESCE(item_name, '') LIKE CONCAT('%',#{item_name},'%')
+    AND COALESCE(item_no, '') LIKE CONCAT('%',#{item_no},'%')
+    AND COALESCE(item_type, '') LIKE CONCAT('%',#{item_type},'%')
+	AND item_category='제품'
+	AND (useyn is NULL OR useyn = 'y')
+	AND company_code = #{company_code}
+  ]]>
+ </select>
+  <!-- 품목유형등록 목록-->
+ <select id="selectItemType" resultType="ItemType" parameterType="String">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_itemtype
+	WHERE item_category='제품'
+	AND company_code = #{company_code}
+ ]]>
+ </select>
+ <!-- 재고단위 목록 -->
+ <select id="stockunitList" resultType="ItemStockUnit" parameterType="String">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_item_stockunit
+	WHERE company_code = #{company_code}
+ ]]>
+ </select>
+ <!-- 재고단위 등록 -->
+  <insert id="StockUnitInsert" parameterType="ItemStockUnit">
+ <![CDATA[
+ 	INSERT INTO ma_item_stockunit(item_stock_unit,company_code)
+	VALUE(#{item_stock_unit},#{company_code})
+ ]]>
+</insert>
+ <!-- 재고단위 삭제 -->
+ <delete id="deleteStockUnit">
+ <![CDATA[
+ 	delete from ma_item_stockunit where item_stock_unit=#{item_stock_unit} AND company_code = #{company_code}
+ ]]>
+</delete>
+<!-- 재고단위 검색 -->
+  <select id="ItemStockUnitSearch" resultType="ItemStockUnit" parameterType="ItemStockUnit">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_item_stockunit
+	WHERE COALESCE(item_stock_unit, '') LIKE CONCAT('%',#{item_stock_unit},'%')
+	AND company_code = #{company_code}
+  ]]>
+ </select>
+  <!-- 규격 목록 -->
+ <select id="spList" resultType="ItemSpecification" parameterType="String">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_item_specification
+	WHERE company_code = #{company_code}
+ ]]>
+ </select>
+ <!-- 규격 등록 -->
+  <insert id="spInsert" parameterType="ItemSpecification">
+ <![CDATA[
+ 	INSERT INTO ma_item_specification(item_specification,company_code)
+	VALUE(#{item_specification},#{company_code})
+ ]]>
+</insert>
+ <!-- 규격 삭제 -->
+ <delete id="deleteSpecification">
+ <![CDATA[
+ 	delete from ma_item_specification where item_specification=#{item_specification} AND company_code = #{company_code}
+ ]]>
+</delete>
+<!-- 규격 검색 -->
+  <select id="spSearch" resultType="ItemSpecification" parameterType="ItemSpecification">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_item_specification
+	WHERE COALESCE(item_specification, '') LIKE CONCAT('%',#{item_specification},'%')
+	AND company_code = #{company_code}
+  ]]>
+ </select>
+<!-- 품목유형등록(제품) 검색 -->
+  <select id="typeselectsearch" resultType="ItemType" parameterType="ItemType">
+ <![CDATA[
+ 	SELECT *
+	FROM ma_itemtype
+	WHERE item_category='제품'
+	AND COALESCE(item_type, '') LIKE CONCAT('%',#{item_type},'%')
+	AND company_code = #{company_code}
+  ]]>
+ </select>
+	
+</mapper>

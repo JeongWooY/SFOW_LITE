@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.stockWh">
+
+	<!-- 
+	이런 타입은 MyBatis에 내장된(built-in) typeAlias 이기 때문에 modelConfig.xml에 등록하지 않고도 바로 사용 가능
+	- java.lang.Integer => int
+	- java.lang.String => string
+	
+	다른종류는 modelConfig.xml에 등록해줘야 한다.
+	<typeAlias type="com.ourcom.app3.domain.Article" alias="article"/>
+	대신 action-mybatis.xml에서 modelConfig.xml 사용가능하도록 주석 해제 필요.
+	-->
+	
+	
+	
+<!-- 		SELECT * FROM mt_stock_detail -->
+<!-- 		WHERE COALESCE(warehouse_code, '') LIKE CONCAT('%', #{warehouse_code}, '%')  -->
+<!-- 		AND COALESCE(warehouse_name, '') LIKE CONCAT('%', #{warehouse_name}, '%') -->
+<!-- 		AND COALESCE(lot_no, '') LIKE CONCAT('%', #{lot_no}, '%') -->
+<!-- 		AND COALESCE(item_category, '') LIKE CONCAT('%', #{item_category}, '%') -->
+<!-- 		AND COALESCE(item_code, '') LIKE CONCAT('%', #{item_code}, '%') -->
+<!-- 		AND COALESCE(item_name, '') LIKE CONCAT('%', #{item_name}, '%') -->
+	
+	<!-- select 요소  : select 쿼리문 실행
+		 id속성 : unique해야한다. 각 요소를 구분하기 위한 용도 -->
+	<!-- 전체 게시물수 조회 -->
+
+	<select id="allStockList" resultType="com.yeonoo.stock.domain.Stock" parameterType="String">
+	  <![CDATA[
+		SELECT s.lot_no, i.company_code, i.item_code, i.item_category, i.item_stock_unit, i.item_specification, i.item_name, i.item_category, w.warehouse_code, w.warehouse_name, wd.area_code
+		FROM pp_perform s
+		INNER JOIN ma_item i ON s.item_code = i.item_code
+		INNER JOIN wh w ON i.company_code = w.company_code
+		INNER JOIN wh_detail wd ON w.warehouse_code = wd.warehouse_code
+		WHERE i.company_code = #{company_code}
+	  ]]>
+	</select>
+
+	<update id="updateStock" parameterType="com.yeonoo.stock.domain.Stock">
+	  <![CDATA[
+		update mt_stock_detail
+		set pass_quantity = #{pass_quantity}, fail_quantity=#{fail_quantity}, quantity=#{quantity}, item_type=#{item_type}
+		where lot_no=#{lot_no}
+	  ]]>
+	</update>
+	
+	<select id="searchStockList" resultType="com.yeonoo.stock.domain.Stock" parameterType="map">
+	  <![CDATA[
+		SELECT s.lot_no, i.company_code, i.item_code, i.item_category, i.item_stock_unit, i.item_specification, i.item_name, i.item_category, w.warehouse_code, w.warehouse_name, wd.area_code
+		FROM pp_perform s
+		INNER JOIN ma_item i ON s.item_code = i.item_code
+		INNER JOIN wh w ON i.company_code = w.company_code
+		INNER JOIN wh_detail wd ON w.warehouse_code = wd.warehouse_code
+		WHERE COALESCE(w.warehouse_code, '') LIKE CONCAT('%', #{stock.warehouse_code}, '%') 
+		  AND COALESCE(w.warehouse_name, '') LIKE CONCAT('%', #{stock.warehouse_name}, '%')
+		  AND COALESCE(s.lot_no, '') LIKE CONCAT('%', #{stock.lot_no}, '%')
+		  AND COALESCE(i.item_category, '') LIKE CONCAT('%', #{stock.item_category}, '%')
+		  AND COALESCE(i.item_code, '') LIKE CONCAT('%', #{stock.item_code}, '%')
+		  AND COALESCE(i.item_name, '') LIKE CONCAT('%', #{stock.item_name}, '%')
+		  AND i.company_code = #{company_code}
+	  ]]>
+	</select>
+	
+	
+	<select id="searchWhList" resultType="com.yeonoo.stock.domain.Stock">
+	  <![CDATA[
+		SELECT DISTINCT warehouse_code, warehouse_name
+		FROM wh
+	  ]]>
+	</select>
+	
+	
+	<select id="searchWh" resultType="com.yeonoo.stock.domain.Stock" parameterType="com.yeonoo.stock.domain.Stock">
+	  <![CDATA[
+		SELECT DISTINCT warehouse_code, warehouse_name FROM wh
+		WHERE COALESCE(warehouse_code, '') LIKE CONCAT('%', #{warehouse_code}, '%') 
+		AND COALESCE(warehouse_name, '') LIKE CONCAT('%', #{warehouse_name}, '%')
+	  ]]>
+	</select>
+	
+</mapper>

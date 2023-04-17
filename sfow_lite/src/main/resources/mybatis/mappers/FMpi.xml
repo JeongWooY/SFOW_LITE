@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="mapper.FMpi">
+ 
+	<resultMap type="FMpi"  
+	           id="FMpiResult">
+		<!-- <result property="필드명"  column="컬럼명"/>	 -->
+		<result property="in_number"  column="in_number"/>	
+		<result property="in_date"  column="in_date"/>	
+		<result property="item_code"  column="item_code"/>	
+		<result property="item_name"  column="item_name"/>	
+		<result property="item_no"  column="item_no"/>	
+		<result property="item_specification"  column="item_specification"/>	
+		<result property="item_stock_unit"  column="item_stock_unit"/>	
+		<result property="in_detail_quantity"  column="in_detail_quantity"/>	
+
+	</resultMap>
+	
+	<!-- 전체목록조회 -->
+	<select id="FMpiAllList"  resultMap="FMpiResult">
+		<![CDATA[
+			SELECT pid.in_number,pi.in_date,mi.item_code,mi.item_name,mi.item_no,mi.item_specification,mi.item_stock_unit
+			FROM po_in PI, ma_item mi, po_in_detail pid
+			WHERE pid.item_code = mi.item_code
+			AND PI.in_number = pid.in_number
+		]]>
+	</select>
+	
+	<!-- 수정하기 -->
+	<update id="updateFMpi" parameterType="FMpi">
+		<![CDATA[
+		UPDATE po_in PI, po_in_detail pid, ma_item mi
+		SET 
+			PI.in_date = #{in_date},
+		    mi.item_name = #{item_name},
+		    mi.item_no = #{item_no},
+		    mi.item_specification = #{item_specification},
+		    mi.item_stock_unit = #{item_stock_unit}
+		WHERE PI.in_number = pid.in_number
+		AND pid.item_code = mi.item_code
+		AND pid.in_number = #{in_number};
+		]]>
+	</update>
+	
+	<!-- 검색하기 -->
+   <select id="FMpiList" resultMap="FMpiResult">
+      <![CDATA[
+         SELECT pid.in_number,pi.in_date,mi.item_code,mi.item_name,mi.item_no,mi.item_specification,mi.item_stock_unit,w.warehouse_code
+         from po_in PI, ma_item mi, po_in_detail pid,wh w
+         WHERE pid.item_code = mi.item_code
+		 AND PI.in_number = pid.in_number
+		 AND w.warehouse_code = pid.warehouse_code
+		 
+         
+         and COALESCE(pid.in_number, '') LIKE CONCAT('%', #{in_number}, '%')
+         and COALESCE(mi.item_code, '') LIKE CONCAT('%', #{item_code}, '%')
+         and COALESCE(pi.in_date, '') LIKE CONCAT('%', #{in_date}, '%')
+         and COALESCE(w.warehouse_code, '') LIKE CONCAT('%', #{warehouse_code}, '%')
+         
+      ]]>   
+   </select>
+	
+</mapper>    
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.req">
+	<resultMap type="reqVO" id="reqVO1">
+		<result property="request_number" column="request_number"/>
+		<result property="request_type" column="request_type"/>
+		<result property="request_date" column="request_date"/>
+		<result property="request_empid" column="request_empid"/>
+		<result property="createdate" column="createdate"/>
+		<result property="memo" column="memo"/>
+		<result property="delyn" column="delyn"/>
+		<result property="company_code" column="company_code"/>
+	</resultMap>
+<!--  
+ 	<select id="reqOrder" resultMap="reqVO1">
+		<![CDATA[
+			SELECT po.request_number,po.request_type,po.request_date,po.request_empid,po.createdate,po.memo,po.delyn,ma.company_code
+			FROM po_request po, ma_companyinfo ma
+			WHERE po.company_code=ma.company_code
+			AND po.company_code=#{company_code}
+			AND po.delyn='N'
+		]]> 	
+	</select> -->
+ 
+ 	<select id="reqOrder" resultMap="reqVO1" parameterType="Map">
+		<![CDATA[
+			SELECT request_number,request_type,request_date,request_empid,createdate,memo,delyn,company_code
+			FROM po_request
+			WHERE company_code=#{company_code}
+			AND delyn='N'
+		]]> 	
+	</select>
+	
+<!--    <select id="reqSelect" resultMap="reqVO1" parameterType="Map">
+      <![CDATA[
+	      	SELECT po.request_number,po.request_type,po.request_date,po.request_empid,po.createdate,po.memo,po.delyn,ma.company_code
+			FROM po_request po, ma_companyinfo ma
+			WHERE po.company_code=#{company_code}
+			AND po.delyn='N'
+			AND COALESCE(po.request_number, '') LIKE CONCAT('%', #{reqVO.request_number}, '%')
+			AND COALESCE(po.request_type, '') LIKE CONCAT('%', #{reqVO.request_type}, '%')
+			AND COALESCE(po.request_date, '') LIKE CONCAT('%', #{reqVO.request_date}, '%')
+			AND COALESCE(po.request_empid, '') LIKE CONCAT('%', #{reqVO.request_empid}, '%')
+      ]]>   
+   </select> -->
+   <select id="reqSelect" resultMap="reqVO1" parameterType="Map">
+      <![CDATA[
+	      	SELECT request_number,request_type,request_date,request_empid,createdate,memo,delyn,company_code
+			FROM po_request
+			WHERE company_code=#{company_code}
+			AND delyn='N'
+			AND COALESCE(request_number, '') LIKE CONCAT('%', #{reqVO.request_number}, '%')
+			AND COALESCE(request_type, '') LIKE CONCAT('%', #{reqVO.request_type}, '%')
+			AND COALESCE(request_date, '') LIKE CONCAT('%', #{reqVO.request_date}, '%')
+			AND COALESCE(request_empid, '') LIKE CONCAT('%', #{reqVO.request_empid}, '%')
+      ]]>   
+   </select>
+   
+   <select id="reqSelect1" resultType="reqModalVO" parameterType="Map">
+      <![CDATA[
+	      	SELECT id,user_name FROM cm_userinfo
+	      	WHERE company_code=#{company_code}
+      ]]>   
+   </select>
+   
+   <select id="reqSelect2" resultType="reqModalVO" parameterType="Map">
+	      	SELECT id,user_name FROM cm_userinfo
+	      	WHERE company_code=#{company_code}
+         	AND user_name LIKE CONCAT('%', #{user_name}, '%')
+   </select>
+<!-- 	      	<if test="user_name != null and user_name !=''">
+         </if> -->
+         
+    <!-- 
+    <select id="reqOrderDetail" resultType="reqDetailVO">
+		<![CDATA[
+			SELECT pd.request_number,pd.request_order,ma.item_code,mc.client_name,ma.item_name,pd.item_no,ma.item_stock_unit,pd.request_quantity,pd.price,pd.amount,pd.tax_amount,pd.memo,mc.no
+			FROM po_request_detail pd, po_request po, ma_item ma,ma_client_company mc
+			WHERE pd.request_number=#{request_number} 
+			AND pd.request_number=po.request_number
+			AND pd.item_code=ma.item_code
+			AND pd.no=mc.no
+		]]> 	
+	</select>
+    -->
+	
+	<select id="reqOrderDetail" resultType="reqDetailVO">
+		<![CDATA[
+			SELECT pd.request_number,pd.request_order,ma.item_code,mc.client_name,ma.item_name,ma.item_no,ma.item_stock_unit,pd.request_quantity,pd.price,pd.amount,pd.tax_amount,pd.memo,mc.no
+			FROM po_request_detail pd, po_request po, ma_item ma,ma_client_company mc
+			WHERE pd.request_number=#{request_number} 
+			AND pd.request_number=po.request_number
+			AND pd.item_code=ma.item_code
+			AND pd.no=mc.no
+		]]> 	
+	</select>
+	
+	<update id="reqUpdate" parameterType="reqVO">
+		<![CDATA[
+			UPDATE po_request
+			SET request_type=#{request_type},request_date=#{request_date},request_empid=#{request_empid},memo=#{memo},createdate=NOW()
+			WHERE request_number=#{request_number}
+		]]> 	
+	</update>
+	<!-- 계산식 확인필요 -->
+<!-- 
+	<update id="reqDetailUpdate" parameterType="reqDetailVO">
+		<![CDATA[
+			UPDATE po_request_detail pd, ma_item ma
+			SET ma.item_code =#{item_code},pd.request_quantity=#{request_quantity},ma.buy_price=#{buy_price},pd.amount=(pd.request_quantity*ma.buy_price),pd.tax_amount=(pd.request_quantity*ma.buy_price)*1.1,pd.memo=#{memo}
+			WHERE pd.request_order=#{request_order}
+			AND pd.item_code=ma.item_code
+		]]> 	
+	</update>
+ -->
+ 
+ 	<update id="reqDetailUpdate" parameterType="reqDetailVO">
+		<![CDATA[
+			UPDATE po_request_detail pd, ma_item ma, ma_item_price mp
+			SET pd.item_code =#{item_code},ma.item_name=#{item_name},pd.item_no=#{item_no},ma.item_stock_unit=#{item_stock_unit},pd.request_quantity=#{request_quantity},pd.price=#{price},pd.amount=(pd.request_quantity*pd.price),pd.tax_amount=(pd.request_quantity*pd.price)*1.1,pd.memo=#{memo}
+			WHERE  pd.item_code=ma.item_code 
+			AND pd.item_no=mp.item_no
+			AND pd.request_order=#{request_order}
+		]]> 	
+	</update>
+ 
+ 
+	
+	<update id="reqDel" parameterType="reqVO">
+		<![CDATA[
+			UPDATE po_request
+			SET delyn='Y'
+			WHERE request_number=#{request_number}
+		]]> 	
+	</update>
+	
+	
+	<insert id="reqInsert" parameterType="reqVO" useGeneratedKeys="true" keyProperty="request_number">
+      <selectKey keyProperty="request_number" resultType="String" order="BEFORE">
+         SELECT po_request_seq_12('PR') FROM DUAL
+      </selectKey>
+      <![CDATA[
+         insert into po_request (request_number, request_type, request_date, request_empid, createdate, memo, delyn, company_code)
+         values (#{request_number}, #{request_type}, #{request_date}, #{request_empid}, now(), #{memo}, 'N' ,#{company_code})
+      ]]>
+   </insert>
+     
+     
+	<!-- request_number, client_code, item_code hidden?
+	  <selectKey keyProperty="request_number" resultType="String" order="BEFORE">
+	  	SELECT pd.request_order,ma.item_code,mc.client_name,ma.item_name,pd.item_no,ma.item_stock_unit,pd.request_quantity,ma.buy_price,pd.amount,pd.tax_amount,pd.memo
+			FROM po_request_detail pd, po_request po, ma_item ma, ma_client_company mc
+			WHERE pd.request_number=#{request_number} 
+			AND pd.request_number=po.request_number
+			AND pd.item_code=ma.item_code
+			AND pd.no=mc.no
+	  </selectKey>
+	 -->
+	<insert id="reqDetailInsert" parameterType="reqDetailVO">
+	  <![CDATA[
+		INSERT INTO po_request_detail (request_order,request_quantity,amount,tax_amount,memo,price,request_number,no,item_code,item_no)
+		VALUES (#{request_order},#{request_quantity},(request_quantity*#{buy_price}), (request_quantity*#{buy_price})*1.1,#{memo},#{buy_price},#{request_number},#{no},#{item_code},#{item_no})
+	  ]]>
+	</insert>
+	  	<!--
+	 <selectKey keyProperty="request_number" resultType="String" order="BEFORE">
+	 SELECT request_number FROM po_request
+	 </selectKey>
+	  	 INSERT INTO po_request_detail (request_order,request_quantity,amount,tax_amount,memo,price,request_number,no,item_code,item_no)
+	  	VALUES (#{request_order}, #{request_quantity}, (request_quantity *price), (request_quantity * price) * 1.1, #{memo},#{buy_price},#{request_number},#{no},#{item_code},#{item_no}) -->
+<!-- 
+ 	<select id="reqItem" resultType="reqDetailVO">
+	<![CDATA[
+		SELECT item_code,item_name,item_no,item_stock_unit
+		FROM ma_item
+		WHERE useyn='Y'
+	]]> 	
+	</select>
+ -->
+ 	<select id="reqItem" resultType="reqDetailVO" parameterType="Map">
+	<![CDATA[
+		SELECT ma.item_code,ma.item_name,ma.item_no,ma.item_stock_unit,mp.buy_price
+		FROM ma_item ma, ma_item_price mp
+		WHERE ma.useyn='Y'
+		AND mp.item_no=ma.item_no
+		AND mp.company_code=#{company_code}
+	]]> 	
+	</select>
+		
+
+	
+	
+</mapper>

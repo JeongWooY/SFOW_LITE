@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.yeonoo</groupId>
+	<artifactId>sfow</artifactId>
+	<name>sfow_lite</name>
+	<packaging>war</packaging>
+	<version>1.0.0-BUILD-SNAPSHOT</version>
+	<properties>
+		<java-version>1.8</java-version>
+		<org.springframework-version>4.3.0.RELEASE</org.springframework-version>
+		<org.aspectj-version>1.6.10</org.aspectj-version>
+		<org.slf4j-version>1.6.6</org.slf4j-version>
+	</properties>
+	<dependencies>
+		
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework-version}</version>
+			<exclusions>
+				<!-- Exclude Commons Logging in favor of SLF4j -->
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				 </exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+
+		<!-- AspectJ : AOP를 사용하는 AspectJ라이브러리
+		     참고  AOP(Aspect Oriented Programming) 
+		     핵심 비즈니스 로직 외에 부가적인 기능(예외처리, 트랜젝션처리, 로깅처리 등)을
+		     효율적으로 관리하도록 하여  응집도가 높은 코드를 유지할 수 있도록 함.   
+		-->		
+		<!-- AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${org.aspectj-version}</version>
+		</dependency>	
+
+		<!-- Logging :로그기록하는 slf4j관련 라이브러리  -->
+		<!-- Logger 클래스는  log4j를 지원하는 핵심클래스로서, 아래와 같은 레벨이 있다. 로그출력여부는 레벨에 따라 결정된다. 
+			 
+			 FATAL - 조기 종료를 유발하는 심각한 오류가 발생하는 상태를 뜻한다
+ 			 ERROR - 기타 런타임오류 or 예기치 않는 상태
+ 			 WARN  - 경고성메세지. 사용되지 않는 api사용. 바람직하지 않거나  예기치 않는 런타임 상황
+			 INFO  - 정보제공용 메세지
+			 DEBUG - 디버그 용도
+			 TRACE - 가장 하위 로깅 레벨. 모든 로그에 대한 상세한 정보  
+			  
+			  레벨은 TRACE<DEBUG<INFO<WARN<ERROR<FATAL 순으로 레벨이 높다.
+			 예) INFO레벨 이상으로 출력을 원하면 INFO, WARN, ERROR, FATAL로그까지 출력 
+		-->
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${org.slf4j-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${org.slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${org.slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- log4j 로그문 출력 라이브러리 -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.15</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.mail</groupId>
+					<artifactId>mail</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jmx</groupId>
+					<artifactId>jmxri</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- @Inject -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+		<!-- Servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<!-- Junit Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- 롬북 라이브러리 -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.20</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JDBC 연동을 위한 라이브러리 -->
+	    <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
+		<!-- Java에서 제공하는 Reflection 및 Introspection APls를 쉽게사용할 수 있게하는 wrapper 라이브러리-->
+        <!--  데이터소스 관련 라이브러리 -->
+		<dependency>
+		    <groupId>commons-beanutils</groupId>
+		    <artifactId>commons-beanutils</artifactId>
+		    <version>1.9.4</version>
+		</dependency>
+
+		<!-- DBCP(DB Connection Pool) 데이터베이스 커넥션 풀 라이브러리 -->
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+         	<artifactId>commons-dbcp</artifactId>
+         	<version>1.2.2</version>
+        </dependency>
+
+		<!-- CGLIB 코드생성 라이브러리 (런타임시 동적으로 자바 클래스의 프록시 객체 생성) -->
+        <dependency>
+         	<groupId>cglib</groupId>
+         	<artifactId>cglib-nodep</artifactId>
+         	<version>2.2</version>
+        </dependency>
+      
+      	<!-- mybatis를 위한 라이브러리 -->
+        <dependency>
+         	<groupId>org.mybatis</groupId>
+         	<artifactId>mybatis</artifactId>
+         	<version>3.1.0</version>
+        </dependency>
+        <!-- mybatis와 spring을 연결시키는 라이브러리 -->
+        <dependency>
+         	<groupId>org.mybatis</groupId>
+         	<artifactId>mybatis-spring</artifactId>
+         	<version>1.1.0</version>
+        </dependency>
+		
+		<!-- 썸네일 이미지 -->
+	    <dependency>
+			<groupId>net.coobird</groupId> 
+			<artifactId>thumbnailator</artifactId> 
+	         <version>0.4.8</version> 
+	    </dependency>
+		
+		<!-- Commons FileUpload (파일업로드를 위한 라이브러리) -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+        
+        <!-- tiles 라이브러리 -->
+		<!-- <dependency>
+			<groupId>org.apache.tiles</groupId>
+			<artifactId>tiles-core</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tiles</groupId>
+			<artifactId>tiles-jsp</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tiles</groupId>
+			<artifactId>tiles-servlet</artifactId>
+			<version>2.2.2</version>
+		</dependency>  -->
+        
+        
+        <!-- JSON을 JavaObject로 변환,  JavaObject를 JSON으로 변환 -->
+   		<dependency>
+		    <groupId>net.sf.json-lib</groupId>
+		    <artifactId>json-lib</artifactId>
+		    <version>2.4</version>
+		    <classifier>jdk15</classifier>    
+		</dependency>
+        <dependency>
+        	<groupId>com.fasterxml.jackson.core</groupId>
+        	<artifactId>jackson-databind</artifactId>
+        	<version>2.14.2</version>
+        </dependency>
+        
+        <!--  ajax관련 lib -->
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.14.2</version>
+      </dependency>
+	<!--  
+	 https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind 
+	-->
+<!--       <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.3</version>
+      </dependency> -->
+	<!--  
+	 https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations 
+	-->
+	      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.14.2</version>
+      </dependency>
+        
+        <!-- MariaDB -->
+		<dependency>
+		    <groupId>org.mariadb.jdbc</groupId>
+		    <artifactId>mariadb-java-client</artifactId>
+		    <version>2.7.0</version>
+		</dependency>
+		
+		<!--  ajax관련 lib -->
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.14.2</version>
+      </dependency>
+<!--  
+ https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind 
+-->
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.3</version>
+      </dependency>
+<!--  
+ https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations 
+-->
+      <dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.13.3</version>
+      </dependency>
+
+
+		<!-- spring-security-core -->
+    <!-- Spring Security -->
+    <dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-core</artifactId>
+		    <version>4.2.20.RELEASE</version>
+		</dependency>
+    <dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-web</artifactId>
+		    <version>4.2.20.RELEASE</version>
+		</dependency>
+    <dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-config</artifactId>
+		    <version>4.2.20.RELEASE</version>
+		</dependency>
+   <dependency>
+	    <groupId>org.springframework.security</groupId>
+	    <artifactId>spring-security-taglibs</artifactId>
+	    <version>4.2.20.RELEASE</version>
+	</dependency>
+
+
+
+
+                
+	</dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <additionalProjectnatures>
+                        <projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+                    </additionalProjectnatures>
+                    <additionalBuildcommands>
+                        <buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+                    </additionalBuildcommands>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>true</downloadJavadocs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArgument>-Xlint:all</compilerArgument>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <configuration>
+                    <mainClass>org.test.int1.Main</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

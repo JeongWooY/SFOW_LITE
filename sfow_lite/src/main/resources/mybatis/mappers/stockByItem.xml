@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.stockByItem">
+
+	<!-- <resultMap type="stock" id="stock">
+        <result property="company_code" column="company_code"/>
+        <result property="item_category" column="item_category"/>
+        <result property="item_code" column="item_code"/>
+        <result property="item_name" column="item_name"/>
+        <result property="item_no" column="item_no"/>
+        <result property="item_specification" column="item_specification"/>
+        <result property="item_stock_unit" column="item_stock_unit"/>
+        <result property="pass_quantity" column="pass_quantity"/>
+        <result property="fail_quantity" column="fail_quantity"/>
+        <result property="quantity" column="quantity"/>
+        <result property="stock_status" column="stock_status"/>
+    </resultMap> -->
+
+    <select id="stockByItemSearch" resultType="stock" parameterType="String">
+        <![CDATA[
+               	SELECT s.company_code, s.item_code, s.pass_quantity, s.fail_quantity, s.quantity, s.stock_status,
+          		 i.item_stock_unit, i.item_category, i.item_name, i.item_no, i.item_specification 
+				FROM mt_stock_detail s
+				INNER JOIN ma_item i ON s.item_code = i.item_code
+				where s.company_code = #{companyCode}
+				
+        ]]>
+    </select>
+     
+    <select id="stockByItemSearchByKeyword" resultType="stock" parameterType="map">
+		<![CDATA[
+			SELECT s.company_code, s.item_code, s.pass_quantity, s.fail_quantity, s.quantity,s.stock_status,
+	               i.item_stock_unit, i.item_category, i.item_name, i.item_no, i.item_specification
+			FROM mt_stock_detail s
+			INNER JOIN ma_item i ON s.item_code = i.item_code
+			WHERE s.company_code = #{companyCode}
+			AND COALESCE(i.item_category, '') LIKE CONCAT('%', #{stock.item_category}, '%')
+			AND COALESCE(s.item_code, '') LIKE CONCAT('%', #{stock.item_code}, '%')
+			AND COALESCE(i.item_name, '') LIKE CONCAT('%', #{stock.item_name}, '%')
+			AND COALESCE(i.item_no, '') LIKE CONCAT('%', #{stock.item_no}, '%') 
+		]]>
+	</select>
+
+   <!--  <update id="stockByItemUpdate" parameterType="stock">
+  		<![CDATA[
+		UPDATE mt_stock_detail
+		SET company_code = #{company_code},
+		    item_category = #{item_category},
+		    item_name = #{item_name},
+		    item_no = #{item_no},
+		    item_specification = #{item_specification},
+		    pass_quantity = #{pass_quantity},
+		    fail_quantity = #{fail_quantity},
+		    quantity = #{quantity}
+		WHERE item_code = #{item_code}
+ 		 ]]>
+	</update> -->
+
+</mapper>

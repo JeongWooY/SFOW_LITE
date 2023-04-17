@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="orderMapper">
+<!--수주서 전체 조회  -->
+		<select id="orderList" parameterType="OrderVO" resultType="OrderVO">
+		<![CDATA[
+		SELECT company_code, order_type, order_number, client_code, order_date, order_empid, order_status, due_date, memo, create_date, create_user, update_date, update_user, delete_yes_no, amount, title 
+		FROM so_order
+		where delete_yes_no='N' AND company_code=#{company_code}
+		]]> 	
+	</select>
+<!-- 상세 조회  -->
+	<select id="orderDetail" parameterType="OrderDetailVO" resultType="OrderDetailVO">
+		 <![CDATA[
+    SELECT
+      d.oddNo,
+      d.quantity,
+      d.delete_yes_no,
+      d.price,
+      d.amount,
+      d.memo,
+      d.item_st_unit,
+      d.item_code,
+      o.order_number
+    FROM so_order_detail d
+    JOIN so_order o ON d.order_number = o.order_number
+    WHERE d.order_number = #{order_number} AND  d.delete_yes_no='N'
+  ]]>
+	</select>
+	
+<!--수주서 등록  -->
+<insert id="orderInsert" parameterType="OrderVO" useGeneratedKeys="true" keyProperty="order_number">
+      <selectKey keyProperty="order_number" resultType="string" order="BEFORE">
+         SELECT so_order_seq_12('O') FROM DUAL
+      </selectKey>
+      <![CDATA[
+         INSERT INTO so_order (
+            company_code, order_number, order_type, client_code, order_date, order_empid,
+            order_status, due_date, memo, create_user,
+            update_user, amount, title, delete_yes_no
+        ) VALUES (
+            #{company_code}, #{order_number}, #{order_type}, #{client_code}, #{order_date}, #{order_empid},
+            COALESCE(#{order_status}, '저장'), #{due_date}, #{memo},  #{create_user}, 
+            #{update_user}, #{amount}, #{title}, COALESCE(#{delete_yes_no}, 'N')
+        )
+      ]]>
+   </insert>
+<!--상세 등록  -->
+<insert id="orderInsert2" parameterType="OrderDetailVO" >
+      <![CDATA[
+      INSERT INTO so_order_detail (order_number, item_code, price, item_st_unit, quantity, amount, memo) 
+	VALUES (#{order_number},#{item_code}, #{price}, #{item_st_unit}, #{quantity}, #{amount}, #{memo})
+      ]]>
+   </insert>
+ <!--삭제(수정)  -->
+<update id="orderDelete" parameterType="OrderVO">
+  <![CDATA[
+    UPDATE so_order SET delete_yes_no = 'Y'
+    WHERE order_number = #{order_number}
+  ]]>
+</update>
+
+ <!--상세삭제(수정)  -->
+<update id="orderDelete2" parameterType="OrderDetailVO">
+  <![CDATA[
+    UPDATE so_order_detail SET delete_yes_no = 'Y'
+    WHERE oddNo = #{oddNo}
+  ]]>
+</update>
+
+<!--상태 변경  -->
+<update id="orderUpdateStatus" parameterType="OrderVO">
+  <![CDATA[
+    UPDATE so_order SET order_status =
+      CASE order_status
+        WHEN '저장' THEN '확정'
+        WHEN '확정' THEN '저장'
+        ELSE order_status
+      END
+    WHERE order_number = #{order_number}
+  ]]>
+</update>
+
+<!--상세 데이터 수정  -->
+<update id="orderUpdate2" parameterType="OrderDetailVO">
+  <![CDATA[
+   UPDATE so_order_detail 
+   SET 
+   quantity=#{quantity}, 
+   price=#{price}, 
+   amount=#{amount}, 
+   memo=#{memo}, 
+   item_st_unit=#{item_st_unit}, 
+   item_code=#{item_code}, 
+   order_number=#{order_number} 
+   WHERE oddNo=#{oddNo}
+  ]]>
+</update>
+
+<!--데이터 수정  -->
+<update id="orderUpdate" parameterType="OrderVO">
+  <![CDATA[
+    UPDATE so_order
+    SET 
+      company_code =#{company_code},
+      order_number = #{order_number},
+      order_type = #{order_type},
+      client_code = #{client_code},
+      order_date = #{order_date},
+      order_empid = #{order_empid},
+      order_status = COALESCE(#{order_status}, '저장'),
+      due_date = #{due_date},
+      memo = #{memo},
+      create_date = #{create_date},
+      create_user = #{create_user},
+      update_date = #{update_date},
+      update_user = #{update_user},
+      amount = #{amount},
+      title = #{title},
+      delete_yes_no = COALESCE(#{delete_yes_no}, 'N')
+    WHERE order_number = #{order_number}
+  ]]>
+</update>
+
+   	<!-- 아이템 조회  -->
+	<select id="getItem" resultType="java.util.Map">
+	  <![CDATA[
+	   SELECT a.item_code, b.sales_price, a.item_stock_unit
+		FROM ma_item a left join ma_item_price b ON a.item_code=b.item_code
+		where company_code = #{company_code}
+	  ]]>
+	</select>
+
+   	<!-- 거래처 조회  -->
+	<select id="getClient" resultType="java.util.Map">
+	  <![CDATA[
+	   SELECT client_code
+		FROM ma_client_company
+		where company_code = #{company_code}
+	  ]]>
+	</select>
+
+</mapper>

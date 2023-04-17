@@ -1,0 +1,80 @@
+@charset "UTF-8";
+
+.ui-datepicker {
+    z-index: 1001 !important; /* 높은 z-index 값을 설정해주세요. */
+}
+
+.hasDatepicker {
+    position: relative;
+    z-index: 9999;
+}
+
+/* 토스트 UI 그리드 z-index 설정 */
+.tui-grid {
+    z-index: 999; /* 낮은 z-index 값을 설정해주세요. */
+}
+
+.focused-row {
+    outline: 2px solid blue;
+}
+
+/* 그리드 버튼 컨테이너 스타일 */
+.grid_btn, .grid2_btn {
+    margin-bottom: 15px;
+    margin-left: 1%;
+    margin-top: 10px;
+}
+
+/* 반품일자 스타일 */
+p {
+    margin-bottom: 10px;
+    color: black;
+    margin-left: 1%;
+}
+
+
+/* 반품일자 입력창 스타일 */
+#datepicker {
+    margin-left: 10px;
+}
+
+h4 {
+    color: black;
+    margin-left: 1%;
+}
+
+#grid, #grid2 {
+    margin-left: 1%;
+    margin-right: 1%;
+}
+
+.custom-button {
+    background-color: rgba(051, 51, 102, 1);
+    font-weight: bolder;
+    color: #fff;
+    border: none;
+    height: 35px;
+    min-width: 80px;
+	font-size: 13px;
+	border-radius: 4px;
+	display: inline-block;
+}
+
+
+#saveBtn:hover, #saveBtn2:hover, #search:hover {
+  background-color: rgba(051, 102, 204, 1);
+  opacity: 0.8;
+}
+
+#deleteRowBtn:hover, #deleteRowBtn2:hover, #reset:hover, #cancelStatusBtn:hover {
+  background-color: rgba(204, 000, 051, 1);
+  opacity: 0.8;
+}
+
+#addRowBtn:hover, #addRowBtn2:hover, #conFirmStatusBtn:hover{
+  background-color: rgba(80, 201, 141);
+  opacity: 0.8;
+}
+
+
+

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="mapper.PPOrder">
+ 
+	<resultMap type="PPOrder"  
+	           id="PPOrderResult">
+		<!-- <result property="필드명"  column="컬럼명"/>	 -->
+		<result property="pp_no"  column="pp_no"/>		
+		<result property="pp_type"  column="pp_type"/>	
+		<result property="po_date"  column="po_date"/>
+		<result property="end_date"  column="end_date"/>	
+		<result property="item_code"  column="item_code"/>	
+		<result property="item_name"  column="item_name"/>	
+		<result property="item_no"  column="item_no"/>	
+		<result property="item_specification"  column="item_specification"/>	
+		<result property="warehouse_code"  column="warehouse_code"/>	
+		<result property="warehouse_name"  column="warehouse_name"/>	
+		<result property="pp_quantity"  column="pp_quantity"/>	
+		<result property="pp_status"  column="pp_status"/>	
+		<result property="pp_date"  column="pp_date"/>
+		<result property="company_code"  column="company_code"/>
+	
+	</resultMap>
+	
+
+<insert id="insertPPOrder" parameterType="PPOrder" useGeneratedKeys="true" keyProperty="pp_no">
+      <selectKey keyProperty="pp_no" resultType="String" order="BEFORE">
+         SELECT pp_order_seq_12('PO')
+      </selectKey>
+		INSERT INTO pp_order (
+		pp_no,pp_type,po_date,end_date,item_code,item_name,item_no,item_specification,warehouse_code,warehouse_name,pp_quantity,pp_status,company_code) 
+		values ( 
+		#{pp_no}, #{pp_type}, #{po_date}, #{end_date}, #{item_code}, #{item_name},#{item_no},#{item_specification}, #{warehouse_code}, #{warehouse_name}, #{pp_quantity}, #{pp_status},#{company_code})
+		
+	</insert>
+	
+	<!-- 등록하기
+<insert id="insertPPOrder" parameterType="PPOrder" useGeneratedKeys="true" keyProperty="pp_no">
+    INSERT INTO pp_order (
+        pp_no, pp_type, po_date, end_date, item_code, item_name, item_no, item_specification, warehouse_code, warehouse_name, pp_quantity, pp_status
+    ) VALUES (
+       #{pp_no}, #{pp_type}, #{po_date}, #{end_date}, #{item_code}, #{item_name}, #{item_no}, #{item_specification}, #{warehouse_code}, #{warehouse_name}, #{pp_quantity}, #{pp_status}
+    )
+</insert>
+	  -->
+		<!-- 검색하기 -->
+   <select id="PPOrderList" resultMap="PPOrderResult">
+      <![CDATA[
+         select ppo.pp_no,ppo.pp_type,ppo.po_date,ppo.end_date,ppo.item_code,ppo.item_name,ppo.item_no,ppo.item_specification,ppo.warehouse_code,ppo.warehouse_name,ppo.pp_quantity,ppo.pp_status,ppo.pp_date,ppo.company_code
+		 from pp_order ppo, ma_item mi, wh w
+		 where ppo.item_code = mi.item_code
+	     AND ppo.warehouse_code = w.warehouse_code
+	     
+		 and COALESCE(ppo.pp_type, '') LIKE CONCAT('%', #{pp_type}, '%')
+		 and COALESCE(ppo.po_date, '') LIKE CONCAT('%', #{po_date}, '%')
+		 and COALESCE(ppo.end_date, '') LIKE CONCAT('%', #{end_date}, '%')
+		 and COALESCE(ppo.pp_no, '') LIKE CONCAT('%', #{pp_no}, '%')
+		 and COALESCE(w.warehouse_code, '') LIKE CONCAT('%', #{warehouse_code}, '%')
+		 and COALESCE(w.warehouse_name, '') LIKE CONCAT('%', #{warehouse_name}, '%')
+         AND ppo.company_code=#{company_code}
+      ]]>   
+   </select>
+	
+	<!-- 수정하기 -->
+	<update id="updatePPOrder" parameterType="PPOrder">
+		<![CDATA[
+		UPDATE pp_order
+		SET 
+		    pp_no = #{pp_no},
+		    pp_type = #{pp_type},
+		    po_date = #{po_date},
+		    end_date = #{end_date},
+		    item_code = #{item_code},
+		    item_name = #{item_name},
+		    item_no = #{item_no},
+		    item_specification = #{item_specification},
+		    warehouse_code = #{warehouse_code},
+		    warehouse_name = #{warehouse_name},
+		    pp_quantity = #{pp_quantity},
+		    pp_status = #{pp_status}
+		 where pp_no = #{pp_no} and company_code=#{company_code}
+		]]>
+	</update>
+
+   <delete id="deletePPOrder" parameterType="String">
+      <![CDATA[
+		DELETE FROM pp_order WHERE pp_no = #{pp_no} and company_code=#{company_code}
+      ]]>
+   </delete>
+  
+	
+</mapper>    
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+

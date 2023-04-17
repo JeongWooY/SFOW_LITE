@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="mapper.warehouse">
+ 
+	<resultMap type="warehouse" id="whResult">
+	 
+		<result property="company_code"  column="company_code"/>	
+		<result property="warehouse_type"  column="warehouse_type"/>	
+		<result property="warehouse_code"  column="warehouse_code"/>	
+		<result property="warehouse_name"  column="warehouse_name"/>	
+		<result property="customer_code"  column="customer_code"/>
+		<result property="memo"  column="memo"/>
+		<result property="useyn"  column="useyn"/>
+		<result property="createdate"  column="createdate"/>
+		<result property="createuser"  column="createuser"/>
+		<result property="updatedate"  column="updatedate"/>
+		<result property="updateuser"  column="updateuser"/>
+		
+		
+	</resultMap>
+	
+ <!-- 	<resultMap type="Wh_Detail" id="Wh_Detail">
+	
+		<result property="company_code"  column="company_code"/>	
+		<result property="warehouse_code"  column="warehouse_type"/>	
+		<result property="area_code"  column="warehouse_code"/>	
+		<result property="area_name"  column="warehouse_name"/>	
+		
+	</resultMap> -->
+	
+	
+
+	<!-- 창고 전체 목록보기 -->
+ 	<select id="whAllList" resultType="warehouse" parameterType="String">
+	 	<![CDATA[
+			select company_code,warehouse_type,warehouse_code,warehouse_name,customer_code,memo,useyn,
+			createdate,createuser,updatedate,updateuser
+			from wh
+			where company_code = #{company_code}
+		]]>
+	</select>
+  
+  <!-- 특정 창고 코드 내부 area 검색 -->
+ 	<select id="wharea" resultType="Wh_Detail" parameterType="String">
+	 	<![CDATA[
+			select * from wh_detail
+			where warehouse_code=#{warehouse_code}
+		]]>
+	</select>
+	
+  <!-- 창고구분, 코드,명으로 검색하기 -->
+  <select id="searchWH" resultType="warehouse">
+	  <![CDATA[
+		  SELECT  company_code,warehouse_type,warehouse_code,warehouse_name,customer_code,memo,useyn,
+			createdate,createuser,updatedate,updateuser
+		  FROM wh
+			WHERE COALESCE(warehouse_type, '') LIKE CONCAT('%', #{warehouse_type}, '%')
+			AND COALESCE(warehouse_code, '') LIKE CONCAT('%', #{warehouse_code}, '%')
+			AND COALESCE(warehouse_name, '') LIKE CONCAT('%', #{warehouse_name}, '%')
+			AND company_code = #{company_code}
+		  ]]>
+  </select>
+  
+
+ 	<insert id="insertWH" parameterType="com.yeonoo.masterdata.wh.domain.WH" >
+  
+ 		 <![CDATA[
+			INSERT INTO wh(company_code,warehouse_type,warehouse_code,warehouse_name,customer_code,memo,useyn,createdate,createuser,updatedate,updateuser)
+			VALUES(#{company_code},#{warehouse_type},#{warehouse_code},#{warehouse_name},#{customer_code},#{memo},#{useyn},NOW(),#{createuser},NULL,#{updateuser})
+		]]>
+  	</insert> 
+  	
+  	<insert id="insertDetail" parameterType="com.yeonoo.masterdata.wh.domain.WH_detail" >
+  		<!-- <selectKey keyProperty="outCode" resultType="String" order="BEFORE">
+  				select 
+  		</selectKey> -->
+  
+ 		 <![CDATA[
+			INSERT INTO wh_detail(company_code,warehouse_code,area_code,area_name)
+			VALUES(#{company_code},#{warehouse_code},#{area_code},#{area_name})
+		]]>
+  	</insert> 
+  
+  
+  
+    <update id="updateWH" parameterType="com.yeonoo.masterdata.wh.domain.WH">
+    
+  		<![CDATA[
+			update wh
+			set company_code=#{company_code},warehouse_type=#{warehouse_type},warehouse_name=#{warehouse_name},customer_code=#{customer_code},memo=#{memo},useyn=#{useyn},createdate=#{createdate},createuser=#{createuser},updatedate=NOW(),updateuser=#{updateuser}
+			where warehouse_code=#{warehouse_code}
+		]]>
+  
+ 	 </update>
+  
+ 	<delete id="deleteWH" parameterType="com.yeonoo.masterdata.wh.domain.WH" >
+	 	<![CDATA[
+	 		 delete from wh
+   			 where warehouse_code=#{warehouse_code}
+	 	]]>
+ 	</delete>
+  
+  
+  </mapper>
+  

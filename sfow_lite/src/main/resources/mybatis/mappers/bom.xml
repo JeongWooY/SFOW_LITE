@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.bom">
+
+	<select id="getItemList" resultType="BomItem" parameterType="String">
+		<![CDATA[
+			SELECT item_code,item_name,item_no,item_specification,item_type,item_category
+			FROM ma_item
+			WHERE NOT item_category = '원자재' AND company_code = #{company_code}
+			ORDER BY item_category DESC
+		]]> 	
+	</select>
+	
+	<select id="selectItem" resultType="BomItem" parameterType="map">
+		<![CDATA[
+			SELECT item_code,item_name,item_no,item_specification,item_type,item_category
+			FROM ma_item
+			WHERE item_code = #{item_code} AND company_code = #{company_code}
+		]]> 	
+	</select>
+	
+	<select id="getBomTree" resultType="BomItem" parameterType="map">
+		<![CDATA[
+			SELECT sitem_cd AS item_code, item_name, item_no, item_specification, item_qty, item_stock_unit,item_type, item_category
+			FROM ma_bom_tree
+			WHERE ppitem_cd = #{ppitem_cd} AND company_code = #{company_code}
+		]]> 	
+	</select>
+	
+	<select id="searchItemListByName" resultType="BomItem" parameterType="map">
+		<![CDATA[
+			SELECT item_name, item_code, item_no, item_stock_unit,item_type, item_category
+			FROM ma_item
+			WHERE item_name LIKE CONCAT('%',#{item_name},'%') AND NOT item_category = '제품' AND company_code = #{company_code}
+		]]> 	
+	</select>
+	
+	<select id="searchItemList" resultType="BomItem" parameterType="String">
+		<![CDATA[
+			SELECT item_name, item_code, item_no, item_stock_unit,item_type, item_category
+			FROM ma_item
+			WHERE NOT item_category = '제품' AND company_code = #{company_code}
+		]]> 	
+	</select>
+	
+	<update id="updateTree" parameterType="map">
+		<![CDATA[
+			UPDATE ma_bom_tree
+			SET item_qty = #{bomItem.item_qty}
+			WHERE ppitem_cd = #{ppitem_cd} AND sitem_cd = #{bomItem.item_code} AND company_code = #{company_code}
+		]]>
+	</update>
+	
+	<insert id="insertTree" parameterType="map">
+		<![CDATA[
+			INSERT INTO ma_bom_tree(company_code,ppitem_cd,sitem_cd,item_name,item_no, item_specification, item_qty, item_stock_unit, item_type, item_category)
+			VALUES (#{company_code},#{ppitem_cd},#{bomItem.item_code},#{bomItem.item_name},#{bomItem.item_no},#{bomItem.item_specification},#{bomItem.item_qty},#{bomItem.item_stock_unit},#{bomItem.item_type},#{bomItem.item_category})
+		]]>
+	</insert>
+	
+	<delete id="deleteTree" parameterType="map">
+		<![CDATA[
+			DELETE FROM ma_bom_tree
+			WHERE ppitem_cd = #{ppitem_cd} AND sitem_cd = #{bomItem.item_code} AND company_code = #{company_code}
+		]]>
+	</delete>
+
+</mapper>

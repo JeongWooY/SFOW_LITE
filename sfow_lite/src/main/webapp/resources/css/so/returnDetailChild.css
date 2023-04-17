@@ -1,0 +1,37 @@
+@charset "UTF-8";
+	
+.custom-button {
+    text-align: center;
+    background-color: rgba(051, 51, 102, 1);
+    font-weight: bolder;
+    color: #fff;
+    border: none;
+    height: 35px;
+    min-width: 80px;
+	font-size: 13px;
+	border-radius: 4px;
+	display: inline-block;
+}
+
+.grid_btn{
+	text-align: center;
+}
+
+#confirmBtn:hover {
+  background-color: rgba(051, 102, 204, 1);
+  opacity: 0.8;
+}
+
+#cancelBtn:hover {
+  background-color: rgba(204, 000, 051, 1);
+  opacity: 0.8;
+}
+
+h3{
+	text-align: right;
+	margin-right: 2%;
+}
+
+#grid{
+	margin: 2%;
+}
